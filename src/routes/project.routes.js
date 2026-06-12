@@ -13,7 +13,7 @@ import {
 import { validate } from "../middlewares/validation.middleware.js"
 import { createProjectValidator, addMemberToProjectValidator } from "../validations/project.validation.js"
 import { verifyJWT, userProjectPermission } from "../middlewares/auth.middleware.js"
-import { AvailableUserRole } from "../utils/constants.js"
+import {  UserRoleEnum , AvailableUserRole } from "../utils/constants.js"
 
 const router = Router()
 
@@ -28,20 +28,20 @@ router
 
 router
     .route("/:projectId")
-    .get(userProjectPermission(AvailableUserRole), getProjectById)
-    .put(userProjectPermission([AvailableUserRole.ADMIN]), validate(createProjectValidator), updateProject)
-    .delete(userProjectPermission([AvailableUserRole.ADMIN]), deleteProject)
+    .get(userProjectPermission(UserRoleEnum), getProjectById)
+    .put(userProjectPermission([UserRoleEnum.ADMIN]), validate(createProjectValidator), updateProject)
+    .delete(userProjectPermission([UserRoleEnum.ADMIN]), deleteProject)
 
 
 router
     .route("/:projectId/members")
     .get(getProjectMembers)
-    .post(userProjectPermission([AvailableUserRole.ADMIN]), validate(addMemberToProjectValidator)
+    .post(userProjectPermission([UserRoleEnum.ADMIN]), validate(addMemberToProjectValidator)
         , addMembersToProject
     )
 router
     .route("/:projectId/members/:userId")
-    .put(userProjectPermission([AvailableUserRole.ADMIN]), updateMemberRole)
-    .delete(userProjectPermission([AvailableUserRole.ADMIN]), deleteMember)
+    .put(userProjectPermission([UserRoleEnum.ADMIN]), updateMemberRole)
+    .delete(userProjectPermission([UserRoleEnum.ADMIN]), deleteMember)
 
 export default router 

@@ -74,26 +74,17 @@ const createtask = asyncHandler(async (req, res) => {
 const getTaskDetail = asyncHandler(async (req, res) => {
     const { taskId } = req.params
 
-    const task = await Task.aggregate([
-        {
-            $match: {
-                _id: new mongoose.Types.ObjectId(taskId),
-            },
-        },
-        {
-            $lookup: {
-                from: "users",
-                localField: "assignedTo",
-                foreignField: "_id",
-                as: "assignedTo",
-                pipeline: [{
-                    User: "users"
-                }
-                ]
-            }
-        }
-    ])
+    const task = await Task.findById(taskId)
+        .populate("assignedTo", "avatar username FullName")
+        .populate("project", "name description")
 
+    if (!task) {
+        throw new ApiError(404, "Task not found")
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, task, "Task details fetched successfully"))
 
 });
 
@@ -214,11 +205,11 @@ const deleteSubTask = asyncHandler(async (req, res) => {
 
 export {
     getTask,
-    createtask,
-    getTaskDetail,
-    updateTask,
-    deleteTask,
-    createSubTask,
-    updateSubTask,
+    createtask,     // validation 
+    getTaskDetail, 
+    updateTask,     // validation
+    deleteTask, 
+    createSubTask,  //validation
+    updateSubTask,  // validation
     deleteSubTask
 }
