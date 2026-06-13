@@ -20,27 +20,29 @@ const router = Router()
 router.use(verifyJWT)
 console.log("Project route loaded")
 
+
+/*  ✅ All routes are tested ✅*/
 router
     .route("/")
     .get(getProjects)
-    .post(validate(createProjectValidator), createProject) //✅ Tested
+    .post(validate(createProjectValidator), createProject) 
 
 
 router
-    .route("/:projectId") // ✅ Tested
+    .route("/:projectId") 
     .get(userProjectPermission(UserRoleEnum), getProjectById)
     .put(userProjectPermission([UserRoleEnum.ADMIN]), validate(createProjectValidator), updateProject)
     .delete(userProjectPermission([UserRoleEnum.ADMIN]), deleteProject)
 
 
 router
-    .route("/:projectId/members") // ✅ Tested
+    .route("/:projectId/members") 
     .get(getProjectMembers)
     .post(userProjectPermission([UserRoleEnum.ADMIN]), validate(addMemberToProjectValidator)
         , addMembersToProject
     )
 router
-    .route("/:projectId/members/:userId") //✅ Tested
+    .route("/:projectId/members/:userId") 
     .put(userProjectPermission([UserRoleEnum.ADMIN]), updateMemberRole)
     .delete(userProjectPermission([UserRoleEnum.ADMIN]), deleteMember)
 
