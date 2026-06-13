@@ -23,24 +23,24 @@ console.log("Project route loaded")
 router
     .route("/")
     .get(getProjects)
-    .post(validate(createProjectValidator), createProject)
+    .post(validate(createProjectValidator), createProject) //✅ Tested
 
 
 router
-    .route("/:projectId")
+    .route("/:projectId") // ✅ Tested
     .get(userProjectPermission(UserRoleEnum), getProjectById)
     .put(userProjectPermission([UserRoleEnum.ADMIN]), validate(createProjectValidator), updateProject)
     .delete(userProjectPermission([UserRoleEnum.ADMIN]), deleteProject)
 
 
 router
-    .route("/:projectId/members")
+    .route("/:projectId/members") // ✅ Tested
     .get(getProjectMembers)
     .post(userProjectPermission([UserRoleEnum.ADMIN]), validate(addMemberToProjectValidator)
         , addMembersToProject
     )
 router
-    .route("/:projectId/members/:userId")
+    .route("/:projectId/members/:userId") //✅ Tested
     .put(userProjectPermission([UserRoleEnum.ADMIN]), updateMemberRole)
     .delete(userProjectPermission([UserRoleEnum.ADMIN]), deleteMember)
 
