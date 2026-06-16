@@ -1,3 +1,5 @@
+import dotenv from "dotenv"
+dotenv.config()
 import User from "../models/user.model.js"
 import { ApiError } from "../utils/ApiError.js"
 import Task from "../models/task.model.js"
@@ -34,18 +36,19 @@ const createtask = asyncHandler(async (req, res) => {
     const { title, description, assignedTo, status } = req.body
     const { projectId } = req.params
 
+
     const project = await Project.findById(projectId)
 
 
     if (!project) {
-        throw new ApiError(404, "Project not found")
+        throw new ApiError(404, "You are not the member of the project")
     }
 
     const files = req.files || []
 
     const attachments = files.map((file) => {
         return {
-            url: ` ${process.env.SERVER_URL}/images/${file.originalname}`,
+            url: ` ${process.env.SERVER_URL}/images/${file.filename}`,
             mimetype: file.mimetype,
             size: file.size
         }
@@ -130,8 +133,8 @@ const deleteTask = asyncHandler(async (req, res) => {
     };
 
     return res
-        .status(204)
-        .json(new ApiResponse(204, null ,"Deleted task successfully"))
+        .status(200)
+        .json(new ApiResponse(200, null ,"Deleted task successfully"))
 });
 
 //Create subtask
