@@ -18,6 +18,8 @@ import {
     createSubTaskValidation,
     updateSubTaskValidation
 } from "../validations/task.validation.js";
+import multer from "multer"
+import { upload } from "../middlewares/multer.middleware.js"
 
 
 const router = Router()
@@ -29,27 +31,25 @@ router.use(verifyJWT)
 console.log("Task route loaded")
 
 
-
-
-router
+router// ✅
     .route("/:projectId/createTask")
-    .get(getTask)
-    .post(userProjectPermission([UserRoleEnum.ADMIN]), validate(createtaskValidation), createtask)
-
-router
-    .route("/:taskId")
-    .get(getTaskDetail)
-    .put(userProjectPermission([UserRoleEnum.ADMIN]), validate(updateTaskValidation), updateTask)
-    .delete(userProjectPermission([UserRoleEnum.ADMIN]), deleteTask)
-
-router
-    .route("/:taskId/create-SubTask")
-    .post(userProjectPermission([UserRoleEnum.ADMIN]), validate(createSubTaskValidation), createSubTask)
+    .post(userProjectPermission([UserRoleEnum.ADMIN]), upload.array("attachments"), validate(createtaskValidation), createtask)
 
 router
     .route("/subtask/:subTaskId")
-    .put(userProjectPermission([UserRoleEnum.ADMIN]), validate(updateSubTaskValidation), updateSubTask)
-    .delete(userProjectPermission([UserRoleEnum.ADMIN]), deleteSubTask)
+    .put(userProjectPermission([UserRoleEnum.ADMIN]), validate(updateSubTaskValidation), updateSubTask) // ✅
+    .delete(userProjectPermission([UserRoleEnum.ADMIN]), deleteSubTask)  // 
+
+router
+    .route("/:projectId/:taskId/create-SubTask")
+    .post(userProjectPermission([UserRoleEnum.ADMIN]), validate(createSubTaskValidation), createSubTask) // ✅
 
 
 
+router // ✅
+    .route("/:projectId/:taskId")
+    .get(getTaskDetail) // ✅
+    .put(userProjectPermission([UserRoleEnum.ADMIN]), validate(updateTaskValidation), updateTask) // ✅
+    .delete(userProjectPermission([UserRoleEnum.ADMIN]), deleteTask) // ✅
+
+export default router
