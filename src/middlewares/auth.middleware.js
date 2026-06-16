@@ -5,6 +5,7 @@ import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import  ProjectMember  from "../models/projectmember.model.js"
 import mongoose from "mongoose"
+import SubTask from "../models/subtask.model.js"
 
 export const verifyJWT = asyncHandler(async (req, res, next) => {
     const token =
@@ -34,33 +35,56 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     }
 });
 
-export const userProjectPermission = (roles = []) => {
-   return  asyncHandler(async (req, res, next) => {
-        const { projectId } = req.params
 
+export const userProjectPermission = (roles = []) => {
+    return asyncHandler(async (req, res, next) => {
+
+        let projectId = req.params.projectId;
+
+        // If projectId isn't in the URL, derive it
         if (!projectId) {
-            throw new ApiError(400, "ProjectId is missing")
-        };
-        console.log('projectId', projectId)
-        console.log("req.user",req.user._id)
+
+            if (req.params.taskId) {
+                const task = await Task.findById(req.params.taskId);
+
+                if (!task) {
+                    throw new ApiError(404, "Task not found");
+                }
+
+                projectId = task.project;
+            }
+
+            else if (req.params.subTaskId) {
+
+                const subTask = await SubTask.findById(req.params.subTaskId)
+                    .populate({
+                        path: "task",
+                        select: "project"
+                    });
+
+                if (!subTask) {
+                    throw new ApiError(404, "SubTask not found");
+                }
+
+                projectId = subTask.task.project;
+            }
+        }
+
         const project = await ProjectMember.findOne({
-            project: new mongoose.Types.ObjectId(projectId),
-            user: new mongoose.Types.ObjectId(req.user._id)
+            project: projectId,
+            user: req.user._id
         });
 
-          if (!project) {
-            throw new ApiError(400, "Project not found..")
-        };
+        if (!project) {
+            throw new ApiError(403, "Project not found or access denied");
+        }
 
-        const givenRole = project?.role
+        req.user.role = project.role;
 
-        req.user.role = givenRole
-        console.log("givenRole" , givenRole)
-        console.log("Allowed role" , roles)
-        if(!roles.includes(givenRole)){
-            throw new ApiError( 403 ," You do not have permission to perform the action")
-        };
-        next()
+        if (!roles.includes(project.role)) {
+            throw new ApiError(403, "You do not have permission");
+        }
 
+        next();
     });
 };
