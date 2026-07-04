@@ -127,7 +127,7 @@ userSchema.methods.generateTempToken = async function () {
         .update(unHashedToken)
         .digest('hex')
 
-    const tokenExpiry = Date.now() + (5 * 60 * 1000) // 3min 
+    const tokenExpiry = Date.now() + (5 * 60 * 1000)  // 5min 
 
 
     return { unHashedToken, HashedToken, tokenExpiry }

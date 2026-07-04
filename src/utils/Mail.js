@@ -44,7 +44,7 @@ console.log("All secret of mail loaded")
     }
 }
 
-const emailVerfificationMailgenContent = (userName, verificationUrl) => {
+const emailVerifificationMailgenContent = (userName, verificationUrl) => {
     return {
         body: {
             name: userName,
@@ -82,4 +82,4 @@ const forgotPasswordVerificationMailgenContent = ( userName , passworResetdUrl) 
     }
 }
 
-export  {emailVerfificationMailgenContent , forgotPasswordVerificationMailgenContent}
+export  {emailVerifificationMailgenContent , forgotPasswordVerificationMailgenContent}

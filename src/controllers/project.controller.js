@@ -175,8 +175,8 @@ const addMembersToProject = asyncHandler(async (req, res) => {
             upsert: true,
         },
     );
-        console.log(user._id)
-        console.log(projectId)
+    console.log(user._id)
+    console.log(projectId)
 
     return res
         .status(201)
@@ -247,7 +247,7 @@ const updateMemberRole = asyncHandler(async (req, res) => {
     const { projectId, userId } = req.params;
     const { newRole } = req.body;
 
-  
+
 
     if (!AvailableUserRole.includes(newRole)) {
         throw new ApiError(400, "Invalid Role")
@@ -263,7 +263,7 @@ const updateMemberRole = asyncHandler(async (req, res) => {
     };
 
 
-   const UpdatedProjectMember = await ProjectMember.findByIdAndUpdate(
+    const UpdatedProjectMember = await ProjectMember.findByIdAndUpdate(
         projectMember._id,
         {
             role: newRole
@@ -304,7 +304,7 @@ const deleteMember = asyncHandler(async (req, res) => {
 
     return res
         .status(201)
-        .json(new ApiResponse(201,  "Project member deleted successfully"))
+        .json(new ApiResponse(201, "Project member deleted successfully"))
 });
 
 

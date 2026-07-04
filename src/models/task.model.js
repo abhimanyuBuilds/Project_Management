@@ -16,8 +16,12 @@ const taskStatusSchema = new Schema({
     },
     assignedTo: {
         type: Schema.Types.ObjectId , 
-        ref: "User" , 
+        ref: "User" ,
         required: true
+    },
+    assignedBy: {
+        type: Schema.Types.ObjectId , 
+        ref: "User"
     },
     status: {
         type: String , 

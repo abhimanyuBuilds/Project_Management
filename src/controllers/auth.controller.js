@@ -3,7 +3,7 @@ import { asyncHandler } from "../utils/async-handler.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { ApiError } from "../utils/ApiError.js"
 
-import { emailVerfificationMailgenContent, forgotPasswordVerificationMailgenContent , sendEmail } from "../utils/Mail.js"
+import { emailVerifificationMailgenContent, forgotPasswordVerificationMailgenContent , sendEmail } from "../utils/Mail.js"
 import jwt from "jsonwebtoken";
 
 
@@ -67,7 +67,7 @@ console.log("Recipient:", email);
     await sendEmail({
         email: user.email,
         subject: "Please verify your email",
-        mailgenContent: emailVerfificationMailgenContent(
+        mailgenContent: emailVerifificationMailgenContent(
             user.username,
             `${req.protocol}://${req.get('host')}/api/v1/auth/verify-email/${unHashedToken} `
         ),
