@@ -2,6 +2,7 @@ import User from "../models/user.model.js"
 import { asyncHandler } from "../utils/async-handler.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { ApiError } from "../utils/ApiError.js"
+
 import { emailVerfificationMailgenContent, forgotPasswordVerificationMailgenContent , sendEmail } from "../utils/Mail.js"
 import jwt from "jsonwebtoken";
 
@@ -35,8 +36,8 @@ const generateAccessAndRefreshTokens = async (userId) => {
 
 // Register 
 const registerUser = asyncHandler(async (req, res) => {
-
-    const { email, username, password, role } = req.body
+try {
+     const { email, username, password, role } = req.body
 
     const existedUser = await User.findOne(
          { email },
@@ -61,13 +62,14 @@ const registerUser = asyncHandler(async (req, res) => {
     user.emailVerificationExpiry = tokenExpiry
 
 
+console.log("Recipient:", email);
 
     await sendEmail({
-        email: email?.email,
+        email: user.email,
         subject: "Please verify your email",
         mailgenContent: emailVerfificationMailgenContent(
             user.username,
-            `${req.protocol}://${req.get('host')}/api//v1/users/verify-email/${unHashedToken} `
+            `${req.protocol}://${req.get('host')}/api/v1/auth/verify-email/${unHashedToken} `
         ),
     });
 
@@ -79,12 +81,17 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     return res
-        .status(200)
+        .status(201)
         .json(
             new ApiResponse(
-                200, { user: createdUser }, "User registered Successfully and Verification Email has been sent on your email.",
+                201, { user: createdUser }, "User registered Successfully and Verification Email has been sent on your email.",
             ),
         );
+        console.log("user created successfully")
+} catch (error) {
+        console.error("Mail not sent")
+        console.error(error)
+}     
 });
 
 // Login 

@@ -12,19 +12,4 @@ const healthCheck = asyncHandler(async (req , res)=> {
 
 
 
-/** 
-const healthCheck = async(req , res) => {
-    try {
-        res 
-            .status(200)
-            .json(
-                new ApiResponse ( 200 , {message: 'Server is Running'})
-            )
-    } catch (error) {
-        
-    }
-}
- */
-
-
 export {healthCheck}

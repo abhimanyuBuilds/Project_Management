@@ -14,6 +14,11 @@ export const createtaskValidation = Joi.object({
         .min(3)
         .max(1000)
         .optional(),
+    assignedTo: Joi.string()
+        .required(),
+    // status: Joi.string()
+    //     .valid(...AvailableTaskStatus)
+    //     .required()
 
 }).options({
     allowUnknown: false

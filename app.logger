@@ -1,0 +1,3 @@
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"GET\",\"url\":\"/api/v1/project\",\"status\":\"401\",\"responseTime\":\"9.496\"}","timestamp":"2026-07-04T09:39:24.377Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/v1/auth/login\",\"status\":\"200\",\"responseTime\":\"286.700\"}","timestamp":"2026-07-04T09:39:31.583Z"}
+{"level":"\u001b[32minfo\u001b[39m","message":"{\"method\":\"POST\",\"url\":\"/api/v1/auth/login\",\"status\":\"200\",\"responseTime\":\"157.507\"}","timestamp":"2026-07-04T09:40:51.655Z"}

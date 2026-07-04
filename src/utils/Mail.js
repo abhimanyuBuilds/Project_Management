@@ -1,10 +1,10 @@
+import dotenv from "dotenv"
+dotenv.config()
 import Mailgen from "mailgen"
 import nodemailer from "nodemailer"
 
 
-
-
-export const  sendEmail = async (options) => {
+export const sendEmail = async (options) => {
     const mailGenerator = new Mailgen ({
         theme: "Default",
         product:{
@@ -14,6 +14,8 @@ export const  sendEmail = async (options) => {
     })
     const emailTextual = mailGenerator.generatePlaintext(options.mailgenContent)
     const emailHtml = mailGenerator.generate(options.mailgenContent)
+   
+console.log("All secret of mail loaded")
 
     const transporter = nodemailer.createTransport({
         host: process.env.MAILTRAP_SMTP_HOST,
@@ -25,8 +27,8 @@ export const  sendEmail = async (options) => {
     })
 
     const mail = {
-        from : " ",
-        to: options ,
+        from : process.env.MAILTRAP_SENDER_EMAIL || "noreply@example.com",
+        to: options.email,
         subject: options.subject , 
         text: emailTextual , 
         html: emailHtml 
@@ -35,6 +37,7 @@ export const  sendEmail = async (options) => {
 
     try {
         await transporter.sendMail(mail)
+        console.log("mail sent successfully")
     } catch (error) {
         console.error("Email service failed. Make sure that you have provided your mailTrap credentials in the .env ")
         console.error("Error", error)        
