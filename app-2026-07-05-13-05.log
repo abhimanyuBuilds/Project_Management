@@ -1,0 +1,5 @@
+{"level":"info","message":"{\"method\":\"POST\",\"url\":\"/api/v1/auth/login\",\"status\":\"200\",\"responseTime\":\"102.227\"}","timestamp":"2026-07-05T07:35:12.916Z"}
+{"level":"info","message":"{\"method\":\"POST\",\"url\":\"/api/v1/auth/login\",\"status\":\"200\",\"responseTime\":\"97.429\"}","timestamp":"2026-07-05T07:35:14.954Z"}
+{"level":"info","message":"{\"method\":\"POST\",\"url\":\"/api/v1/auth/login\",\"status\":\"200\",\"responseTime\":\"100.339\"}","timestamp":"2026-07-05T07:35:15.778Z"}
+{"level":"info","message":"{\"method\":\"POST\",\"url\":\"/api/v1/auth/login\",\"status\":\"200\",\"responseTime\":\"88.337\"}","timestamp":"2026-07-05T07:35:16.566Z"}
+{"level":"info","message":"{\"method\":\"POST\",\"url\":\"/api/v1/auth/login\",\"status\":\"200\",\"responseTime\":\"102.931\"}","timestamp":"2026-07-05T07:35:17.412Z"}
