@@ -5,10 +5,12 @@ import cookieParser from "cookie-parser";
 import  logger  from "./services/logger.js"
 import { swaggerSpec, swaggerUi } from "./swagger/swagger.js"
 import helmet from "helmet";
-
+import { apiLimiter }  from "./middlewares/rateLimit.middleware.js"
 
 const app = express();
-
+// ======================  Rate Limiting   ==================
+app.use("/api" , apiLimiter)
+// ==================End of rate limiting =============
 const allowedOrigin = [
     process.env.CORS_ORIGIN,
     process.env.CORS_ORIGIN2,
