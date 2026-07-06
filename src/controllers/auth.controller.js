@@ -124,7 +124,7 @@ const userLogin = asyncHandler(async (req, res) => {
 
 
     const loggedInUser = await User.findById(user._id)
-        .select(" -password -refreshToken -emailVerificationExpiry -emailVerificationToken  -email -isEmailVerified -role -createdAt -updatedAt -avatar -url -localPath -__v",);
+        .select(" -password -refreshToken -emailVerificationExpiry -emailVerificationToken  -email -isEmailVerified  -createdAt -updatedAt -url -localPath -__v",);
 
 
     const options = {
