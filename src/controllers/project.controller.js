@@ -295,7 +295,7 @@ const deleteMember = asyncHandler(async (req, res) => {
         throw new ApiError(400, " Project Member not found")
     };
 
-    const projectMembers = await ProjectMember.findOneAndDelete(ProjectMember._id);
+    const projectMembers = await ProjectMember.findByIdAndDelete(projectMemberFound._id);
 
 
     if (!projectMembers) {

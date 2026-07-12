@@ -27,7 +27,7 @@ export const loginLimiter = rateLimit({
 
 
 export const registerLimitter = rateLimit({
-    windowMs: process.env.RATE_LIMIT_WINDOW1 ,
+    windowMs: process.env.RATE_LIMIT_WINDOW1,
     max: process.env.RATE_LIMIT_MAX1 , 
     standardHeaders: true , 
     legacyHeaders: false ,
@@ -40,7 +40,7 @@ export const registerLimitter = rateLimit({
 
 
 export const forgotPasswordRateLimiter = rateLimit({
-    windowMs: process.env.RATE_LIMIT_WINDOW,
+    windowMs:process.env.RATE_LIMIT_WINDOW,
     max: process.env.RATE_LIMIT_MAX1 ,
     standardHeaders: true , 
     legacyHeaders: false , 
