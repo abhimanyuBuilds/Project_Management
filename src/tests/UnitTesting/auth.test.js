@@ -13,8 +13,8 @@ afterAll(async () => {
     await mongoose.connection.close();
 });
 
-
-describe("POST /api/v1/auth/login", () => {
+/**LOGIN TEST
+ describe("POST /api/v1/auth/login", () => {
 
     test("should login successfully", async () => {
 
@@ -22,7 +22,7 @@ describe("POST /api/v1/auth/login", () => {
             .post("/api/v1/auth/login")
             .send({
                 email: "superUser770@gmail.com",
-                password: ""
+                password: "029super9901"
             });
 
         
@@ -40,8 +40,11 @@ describe("POST /api/v1/auth/login", () => {
     });
 
 });
-/**
- * @RESULT
+*/
+
+
+/**LOGIN_TEST_RESULT
+ * @LOGINRESULT
  * 2026-07-13T13:03:35.582Z: info: {"method":"POST","url":"/api/v1/auth/login","status":"200","responseTime":"118.716"}
   console.log
     200
@@ -77,3 +80,38 @@ Time:        2.216 s, estimated 7 s
 Ran all test suites.
 
  */
+
+
+
+
+/**LOGOUT USER 
+describe("POST /api/v1/auth/logout" , () => {
+    test("Should logout Successfully" , async () => {
+        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2YTI2N2JkOTEwYjVkNWU5MzNiMjJlYWIiLCJlbWFpbCI6InN1cGVydXNlcjc3MEBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3ODM5NDkzMTgsImV4cCI6MTc4Mzk1MDIxOH0.fvIJUUCl2d_cV9Vd1rcS5fd-1PLjkUsoY_LY2WR262A"
+        const response = await request(app)
+                .post("/api/v1/auth/logout")
+                 .set("Authorization", `Bearer ${token}`);
+
+        expect(response.statusCode).toBe(200);
+
+        expect(response.body.success).toBe(true);
+    })
+}) 
+ */
+
+/**LOGOUT-USER-RESPONSE
+ *@LOGOUT
+ * 2026-07-13T13:29:41.089Z: info: {"method":"POST","url":"/api/v1/auth/logout","status":"200","responseTime":"22.208"}
+ PASS  src/tests/UnitTesting/auth.test.js
+  POST /api/v1/auth/logout
+    √ Should logout Successfully (56 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+Snapshots:   0 total
+Time:        2.162 s
+Ran all test suites.
+ */
+
+
+
