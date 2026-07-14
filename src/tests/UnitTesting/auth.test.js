@@ -4,14 +4,16 @@ import request from "supertest";
 import mongoose from "mongoose";
 import app from "../../app.js";
 import DataBase from "../../db/db.connection.js";
-import user  from "../../models/user.model.js"
+import user from "../../models/user.model.js"
+import crypto from "crypto"
+import { time } from "console";
 
 beforeAll(async () => {
     await DataBase.connectDB();
 });
 
 afterEach(async () => {
-    await user.deleteMany({});
+    await user.deleteOne({});
 });
 
 
@@ -175,5 +177,175 @@ Time:        2.162 s
 Ran all test suites.
  */
 
+/**
+ * @PASS {POST} verify-email/:verificationToken
+ */
 
 
+describe("Verify Email", () => {
+    test("Should verify email successfully", async () => {
+
+        const timestamp = Date.now();
+        const verificationToken = "mytoken-yo-token";
+
+        const hashedToken = crypto
+            .createHash("sha256")
+            .update(verificationToken)
+            .digest("hex");
+
+        const createdUser = await  user.create({
+            email: `superuser770@gmail.com${timestamp}`,
+            username: `super user${timestamp}`,
+            password: "8190103",
+            role: "admin",
+            isEmailVerified: false,
+            emailVerificationToken: hashedToken,
+            emailVerificationExpiry: Date.now() + 10 * 60 * 1000
+        });
+
+        const response = await request(app)
+            .post(`/api/v1/auth/verify-email/${verificationToken}`  );
+
+        console.log(response.statusCode);
+        console.log(response.body);
+
+        const dbUser = await user.findById(createdUser._id);
+
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body.success).toBe(true);
+        expect(response.body.data.isEmailVerified).toBe(true);
+
+        const updatedUser = await user.findById(createdUser._id);
+
+        expect(updatedUser.isEmailVerified).toBe(true);
+        expect(updatedUser.emailVerificationToken).toBeFalsy();
+        expect(updatedUser.emailVerificationExpiry).toBeFalsy();
+    });
+
+    test("Should return 400 if token is missing" , async() => {
+
+         const timestamp = Date.now();
+        const verificationToken = "mytoken-yo-token";
+
+
+        const response = await request(app)
+            .post(`/api/v1/auth/verify-email/${verificationToken}`);
+
+
+            
+        expect(response.statusCode).toBe(400);
+        expect(response.body.success).toBeUndefined()
+
+    })
+});
+
+
+
+
+
+
+/**verify-email test case {output} pass
+ * (Use `node --trace-warnings ...` to show where the warning was created)
+  console.log
+    MongoDB connected successfully✅
+
+      at DataBase.log [as connectDB] (src/db/db.connection.js:35:21)
+
+  console.log
+    Generated hasehd 530021b40478e82e14990e15201d80a89ede138ff862b0618f0c88e9c1ed36e8
+
+      at log (src/controllers/auth.controller.js:216:13)
+
+  console.log
+    Received token : mytoken-yo-token
+
+      at log (src/controllers/auth.controller.js:217:13)
+
+  console.log
+    User found with id  {
+      _id: new ObjectId('6a5628bf86fb2daaf17e2736'),
+      avatar: {
+        url: 'https://placehold.co/200x200',
+        localPath: '',
+        _id: new ObjectId('6a5628bf86fb2daaf17e2735')
+      },
+      username: 'super user1784031423865',
+      email: 'superuser770@gmail.com1784031423865',
+      password: '$2b$10$LR6eZ/WZEEm9eiIXdwPIveBdiiMJKYeyHt39fz5gObu9NA2Ry6AMa',
+      role: 'admin',
+      isEmailVerified: false,
+      emailVerificationToken: '530021b40478e82e14990e15201d80a89ede138ff862b0618f0c88e9c1ed36e8',
+      emailVerificationExpiry: 2026-07-14T12:27:03.865Z,
+      createdAt: 2026-07-14T12:17:03.878Z,
+      updatedAt: 2026-07-14T12:17:03.878Z,
+      __v: 0
+    }
+
+      at log (src/controllers/auth.controller.js:228:13)
+
+2026-07-14T12:17:04.052Z: info: {"method":"POST","url":"/api/v1/auth/verify-email/mytoken-yo-token","status":"200","responseTime":"49.209"}
+  console.log
+    200
+
+      at Object.log (src/tests/UnitTesting/auth.test.js:265:17)
+
+  console.log
+    { statusCode: 200, data: { isEmailVerified: true }, success: true }
+
+      at Object.log (src/tests/UnitTesting/auth.test.js:266:17)
+
+ PASS  src/tests/UnitTesting/auth.test.js
+  Verify Email
+    √ Should verify email successfully (211 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+Snapshots:   0 total
+Time:        3.128 s
+Ran all test suites.
+
+============================  Should return 400 if token is missing ================================
+
+
+
+2026-07-14T12:33:34.414Z: info: {"method":"POST","url":"/api/v1/auth/verify-email/mytoken-yo-token","status":"200","responseTime":"34.043"}
+  console.log
+    200
+
+      at Object.log (src/tests/UnitTesting/auth.test.js:209:17)
+
+  console.log
+    { statusCode: 200, data: { isEmailVerified: true }, success: true }
+
+      at Object.log (src/tests/UnitTesting/auth.test.js:210:17)
+
+  console.log
+    Generated hasehd 530021b40478e82e14990e15201d80a89ede138ff862b0618f0c88e9c1ed36e8
+
+      at log (src/controllers/auth.controller.js:216:13)
+
+  console.log
+    Received token : mytoken-yo-token
+
+      at log (src/controllers/auth.controller.js:217:13)
+
+  console.log
+    User found with id  null
+
+      at log (src/controllers/auth.controller.js:228:13)
+
+2026-07-14T12:33:34.463Z: info: {"method":"POST","url":"/api/v1/auth/verify-email/mytoken-yo-token","status":"400","responseTime":"17.011"}
+ PASS  src/tests/UnitTesting/auth.test.js
+  Verify Email
+    √ Should verify email successfully (184 ms)
+    √ Should return 400 if token is missing (28 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       2 passed, 2 total
+Snapshots:   0 total
+Time:        3.256 s, estimated 4 s
+Ran all test suites.
+
+ * 
+ */
