@@ -4,14 +4,54 @@ import request from "supertest";
 import mongoose from "mongoose";
 import app from "../../app.js";
 import DataBase from "../../db/db.connection.js";
+import user  from "../../models/user.model.js"
 
 beforeAll(async () => {
     await DataBase.connectDB();
 });
 
+afterEach(async () => {
+    await user.deleteMany({});
+});
+
+
 afterAll(async () => {
     await mongoose.connection.close();
 });
+
+
+
+
+
+/**@REGISTER TEST CASE
+ * @REGISTER 
+   describe("POST /api/v1/auth/reigster",() => {
+    test("Should successfully register user" ,async () => {
+
+        const timestamp =  await Date.now()
+
+       const response = await request(app)
+            .post("/api/v1/auth/register")
+            .send({
+                email: `abhimanyu${timestamp}@gmail.com`,
+                username: `abhimanyu${timestamp}`,
+                password: "221122@@@@",
+                role: "admin"
+            });
+
+            console.log(response.status);
+
+        expect(response.statusCode).toBe(201);
+
+        expect(response.body.success).toBe(true);
+        expect(response.body.data.user.email).toBe(`abhimanyu${timestamp}@gmail.com`);
+       
+    })
+}) 
+ */
+
+
+
 
 /**LOGIN TEST
  describe("POST /api/v1/auth/login", () => {
@@ -40,6 +80,28 @@ afterAll(async () => {
     });
 
 });
+
+
+
+
+
+=================================== @OUTPUT ====================================
+
+2026-07-14T09:52:34.004Z: info: {"method":"POST","url":"/api/v1/auth/register","status":"201","responseTime":"3515.639"}
+  console.log
+    201
+
+      at Object.log (src/tests/UnitTesting/auth.test.js:36:21)
+
+ PASS  src/tests/UnitTesting/auth.test.js (5.446 s)
+  POST /api/v1/auth/reigster
+    √ Should successfully register user (3551 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+Snapshots:   0 total
+Time:        5.523 s, estimated 6 s
+Ran all test suites.
 */
 
 

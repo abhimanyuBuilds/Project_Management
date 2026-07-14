@@ -36,7 +36,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
 
 // Register 
 const registerUser = asyncHandler(async (req, res) => {
-try {
+
      const { email, username, password, role } = req.body
 
     const existedUser = await User.findOne(
@@ -88,10 +88,7 @@ console.log("Recipient:", email);
             ),
         );
         console.log("user created successfully")
-} catch (error) {
-        console.error("Mail not sent")
-        console.error(error)
-}     
+
 });
 
 // Login 
