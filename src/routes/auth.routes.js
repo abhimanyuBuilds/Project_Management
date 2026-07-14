@@ -409,7 +409,7 @@ router.route("/logout").post(verifyJWT, logOutUser)
  *               statusCode: 500
  *               message: Something went wrong while verifying email
  */
-router.route("/verify-email").post(verifyJWT, verifyEmailLimiter, verifyEmail)
+router.route("/verify-email/:verificationToken").post(verifyJWT, verifyEmailLimiter, verifyEmail)
 // ==============================  End of Verify-Email REST API Documentation ===============================
 export default router
 

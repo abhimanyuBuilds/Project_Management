@@ -1,10 +1,12 @@
 import User from "../models/user.model.js"
+import crypto, { hash } from "crypto"
 import { asyncHandler } from "../utils/async-handler.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { ApiError } from "../utils/ApiError.js"
 
 import { emailVerifificationMailgenContent, forgotPasswordVerificationMailgenContent , sendEmail } from "../utils/Mail.js"
 import jwt from "jsonwebtoken";
+import { token } from "morgan"
 
 
 
@@ -60,6 +62,11 @@ const registerUser = asyncHandler(async (req, res) => {
 
     user.emailVerificationToken = HashedToken
     user.emailVerificationExpiry = tokenExpiry
+    console.log("\n unhashedToken" , unHashedToken)
+    console.log("\n emailVerificationToken",HashedToken)
+    console.log("\n emailVerificationExpiry" , tokenExpiry)
+
+    await user.save({validateBeforeSave: false})
 
 
 console.log("Recipient:", email);
@@ -191,9 +198,8 @@ const getCurrentUser = asyncHandler(async ( req , res) => {
 });
 
 
-
 const verifyEmail = asyncHandler(async ( req , res)=>{
-    const { verificationToken} = req.params
+    const { verificationToken}  = req.params
 
     if(!verificationToken){
         throw new ApiError(400 , "Email verification token is missing..")
@@ -205,15 +211,29 @@ const verifyEmail = asyncHandler(async ( req , res)=>{
         .update(verificationToken)
         .digest("hex")
 
+
+        //debug
+    console.log("Generated hasehd",hashedToken)
+    console.log("Received token :", verificationToken)
+
+
+
     const user = await User.findOne({
         emailVerificationToken: hashedToken , 
         emailVerificationExpiry: {$gt: Date.now()},
     })
 
+
+    // debug
+    console.log("User found with id ",user)
+
+
+
+
+
     if(!user){
         throw new ApiError(400 , "Token is Invalid or expired")
     }
-
     user.emailVerificationToken = undefined
     user.emailVerificationExpiry = undefined
 

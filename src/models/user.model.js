@@ -115,7 +115,7 @@ userSchema.methods.generateRefreshToken =  function () {
 
 
 
-userSchema.methods.generateTempToken = async function () {
+userSchema.methods.generateTempToken =  function () {
     const unHashedToken = crypto.randomBytes(32).toString('hex')
 
     const HashedToken = crypto
