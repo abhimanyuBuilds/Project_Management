@@ -203,7 +203,7 @@ Integrated Swagger documentation for all endpoints.
 | Email | Nodemailer + Mailtrap |
 | Security | Helmet |
 | Rate Limiting | express-rate-limit |
-| Testing | Jest *(planned for Unit & Integration Testing)* |
+| Testing | Jest *(Applied unit testing on auth)* |
 
 ---
 
