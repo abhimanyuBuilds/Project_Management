@@ -64,7 +64,6 @@ New Authentication Flow Section
 
 The project implements production-oriented Refresh Token Rotation for enhanced session security.
 
-```
                 User Login
                      |
                      ▼
