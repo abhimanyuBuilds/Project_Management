@@ -4,7 +4,7 @@ import { asyncHandler } from "../utils/async-handler.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { ApiError } from "../utils/ApiError.js"
 
-import { emailVerifificationMailgenContent, forgotPasswordVerificationMailgenContent , sendEmail } from "../utils/Mail.js"
+import { emailVerifificationMailgenContent, forgotPasswordVerificationMailgenContent, sendEmail } from "../utils/Mail.js"
 import jwt from "jsonwebtoken";
 import { token } from "morgan"
 
@@ -19,16 +19,22 @@ const generateAccessAndRefreshTokens = async (userId) => {
     try {
 
         const user = await User.findById(userId);
-        const accessToken =   user.generateAccessToken();
-        const refreshToken =  user.generateRefreshToken();
+        const accessToken = user.generateAccessToken();
+        const refreshToken = user.generateRefreshToken();
 
-        user.refreshToken = refreshToken
+
+        const hashrefreshToken = crypto
+            .createHash('sha256')
+            .update(refreshToken)
+            .digest('hex')
+
+        user.refreshToken = hashrefreshToken
         await user.save({ validateBeforeSave: true })
-        return { accessToken , refreshToken }
+        return { accessToken, refreshToken }
 
 
     } catch (error) {
-        console.log("Token error" , error)
+        console.log("Token error", error)
         throw new ApiError(
             500,
             "Something went wrong while generating access token",
@@ -39,10 +45,10 @@ const generateAccessAndRefreshTokens = async (userId) => {
 // Register 
 const registerUser = asyncHandler(async (req, res) => {
 
-     const { email, username, password, role } = req.body
+    const { email, username, password, role } = req.body
 
     const existedUser = await User.findOne(
-         { email },
+        { email },
     );
 
     if (existedUser) {
@@ -62,14 +68,14 @@ const registerUser = asyncHandler(async (req, res) => {
 
     user.emailVerificationToken = HashedToken
     user.emailVerificationExpiry = tokenExpiry
-    console.log("\n unhashedToken" , unHashedToken)
-    console.log("\n emailVerificationToken",HashedToken)
-    console.log("\n emailVerificationExpiry" , tokenExpiry)
+    console.log("\n unhashedToken", unHashedToken)
+    console.log("\n emailVerificationToken", HashedToken)
+    console.log("\n emailVerificationExpiry", tokenExpiry)
 
-    await user.save({validateBeforeSave: false})
+    await user.save({ validateBeforeSave: false })
 
 
-console.log("Recipient:", email);
+    console.log("Recipient:", email);
 
     await sendEmail({
         email: user.email,
@@ -94,15 +100,15 @@ console.log("Recipient:", email);
                 201, { user: createdUser }, "User registered Successfully and Verification Email has been sent on your email.",
             ),
         );
-        console.log("user created successfully")
+    console.log("user created successfully")
 
 });
 
 // Login 
 const userLogin = asyncHandler(async (req, res) => {
-    const { email,  password } = req.body
+    const { email, password } = req.body
 
-    if (!email ) {
+    if (!email) {
         throw new ApiError(400, "email is required to login")
     };
 
@@ -124,7 +130,7 @@ const userLogin = asyncHandler(async (req, res) => {
     };
 
 
-    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id,);
+    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id);
 
 
     const loggedInUser = await User.findById(user._id)
@@ -136,31 +142,131 @@ const userLogin = asyncHandler(async (req, res) => {
         secure: true
     };
 
-    return res 
+    return res
         .status(200)
-        .cookie('accessToken' , accessToken , options)
-        .cookie('refreshToken' , refreshToken , options)
+        .cookie('accessToken', accessToken, options)
+        .cookie('refreshToken', refreshToken, options)
         .json(
-            new ApiResponse( 200 , 
-                {user: loggedInUser ,
-                     accessToken ,
-                      refreshToken} , 
+            new ApiResponse(200,
+                {
+                    user: loggedInUser,
+                    accessToken,
+                    refreshToken
+                },
                 "User LoggedIn Successfully"
-            
-            
+
+
             ),
         );
 });
 
+
+/** Refresh token rotation
+ * @route POST /api/v1/auth/refresh-token
+ */
+
+
+const refreshRotationToken = asyncHandler(async (req, res) => {
+    const incomingRefreshToken = req.cookies.refreshToken
+
+
+
+    if (!incomingRefreshToken) {
+        throw new ApiError(401, "Refresh token is missing")
+    };
+
+
+    // ------------ verify-jwt
+    let decoded
+    try {
+        decoded = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET)
+    } catch (error) {
+        throw new ApiError(401, "Unauthorized")
+    };
+
+    // -------------------- verify-jwt
+
+
+    const user = await User.findById(decoded._id)
+
+
+    /**debugging
+     * console.log("DB token => ", user.refreshToken)
+
+
+    console.log(
+        "Incoming Token =>",
+        incomingRefreshToken
+    );
+     * 
+     */
+
+    if (!user) {
+        throw new ApiError(404, "User not found")
+    };
+
+    // --------------- hashedOld token   
+
+
+    const hashedIncommingRefreshToken = crypto
+        .createHash("sha256")
+        .update(incomingRefreshToken)
+        .digest('hex')
+
+    /**
+     * console.log(
+    "Hashed Incoming Token =>",
+    hashedIncommingRefreshToken
+    );
+    
+     * 
+     */
+    // ------------------ compare old token
+
+    if (user.refreshToken !== hashedIncommingRefreshToken) {
+        throw new ApiError(401, "Invalid Refresh Token")
+    }
+
+    // now generate new token
+
+    const newaccessToken =
+        user.generateAccessToken()
+    const newrefreshToken =
+        user.generateRefreshToken()
+
+
+    // hash new token
+    const hashedNewRefreshToken = crypto
+        .createHash('sha256')
+        .update(newrefreshToken)
+        .digest('hex')
+
+
+    user.refreshToken = hashedNewRefreshToken
+
+    await user.save({ validateBeforeSave: false })
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    };
+
+    return res
+        .status(200)
+        .cookie('accessToken', newaccessToken, options)
+        .cookie('refreshToken', newrefreshToken, options)
+        .json(new ApiResponse(200, { newaccessToken, newrefreshToken }));
+});
+
 //logout
-const logOutUser = asyncHandler(async ( req , res)=> {
+const logOutUser = asyncHandler(async (req, res) => {
 
 
 
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set:{
+            $set: {
                 refreshToken: null,
             },
         },
@@ -174,13 +280,13 @@ const logOutUser = asyncHandler(async ( req , res)=> {
         secure: true
     }
 
-    return res 
+    return res
         .status(200)
-        .clearCookie('accessToken' ,  options)
-        .clearCookie('refreshToken' ,  options)
+        .clearCookie('accessToken', options)
+        .clearCookie('refreshToken', options)
         .json(
-            new ApiResponse( 200 , 
-                {} , 
+            new ApiResponse(200,
+                {},
                 "User logged Out successfully",
             ),
         );
@@ -189,20 +295,20 @@ const logOutUser = asyncHandler(async ( req , res)=> {
 // getCurrentUser
 
 
-const getCurrentUser = asyncHandler(async ( req , res) => {
+const getCurrentUser = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(
-            new ApiResponse(200 , req.user , "Current User fetched successfully")
+            new ApiResponse(200, req.user, "Current User fetched successfully")
         )
 });
 
 
-const verifyEmail = asyncHandler(async ( req , res)=>{
-    const { verificationToken}  = req.params
+const verifyEmail = asyncHandler(async (req, res) => {
+    const { verificationToken } = req.params
 
-    if(!verificationToken){
-        throw new ApiError(400 , "Email verification token is missing..")
+    if (!verificationToken) {
+        throw new ApiError(400, "Email verification token is missing..")
     }
 
 
@@ -212,27 +318,27 @@ const verifyEmail = asyncHandler(async ( req , res)=>{
         .digest("hex")
 
 
-        //debug
-    console.log("Generated hasehd",hashedToken)
+    //debug
+    console.log("Generated hasehd", hashedToken)
     console.log("Received token :", verificationToken)
 
 
 
     const user = await User.findOne({
-        emailVerificationToken: hashedToken , 
-        emailVerificationExpiry: {$gt: Date.now()},
+        emailVerificationToken: hashedToken,
+        emailVerificationExpiry: { $gt: Date.now() },
     })
 
 
     // debug
-    console.log("User found with id ",user)
+    console.log("User found with id ", user)
 
 
 
 
 
-    if(!user){
-        throw new ApiError(400 , "Token is Invalid or expired")
+    if (!user) {
+        throw new ApiError(400, "Token is Invalid or expired")
     }
     user.emailVerificationToken = undefined
     user.emailVerificationExpiry = undefined
@@ -240,19 +346,19 @@ const verifyEmail = asyncHandler(async ( req , res)=>{
 
     user.isEmailVerified = true
 
-    await user.save({validateBeforeSave: false})
+    await user.save({ validateBeforeSave: false })
 
-    return res 
+    return res
         .status(200)
         .json(
-            new ApiResponse(200 , {
+            new ApiResponse(200, {
                 isEmailVerified: true
             },
-        "Email is Verified",
+                "Email is Verified",
             )
         )
-    });
+});
 
 
 
-export {registerUser , userLogin , logOutUser , getCurrentUser  , verifyEmail}
+export { registerUser, userLogin, logOutUser, refreshRotationToken, getCurrentUser, verifyEmail }

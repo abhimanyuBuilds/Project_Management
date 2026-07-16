@@ -1,5 +1,5 @@
 import Router from "express"
-import { registerUser, userLogin, logOutUser, getCurrentUser, verifyEmail } from "../controllers/auth.controller.js"
+import { registerUser, userLogin, logOutUser, refreshRotationToken,getCurrentUser, verifyEmail } from "../controllers/auth.controller.js"
 import { validate } from "../middlewares/validation.middleware.js"
 import { userRegisterValidation, userLoginValidation } from "../validations/auth.validation.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js"
@@ -411,6 +411,9 @@ router.route("/logout").post(verifyJWT, logOutUser)
  */
 router.route("/verify-email/:verificationToken").post(verifyJWT, verifyEmailLimiter, verifyEmail)
 // ==============================  End of Verify-Email REST API Documentation ===============================
+router.route("/currentUser").get(verifyJWT , getCurrentUser) 
+
+
+
+router.route("/refresh-token").post( refreshRotationToken)
 export default router
-
-
