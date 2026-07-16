@@ -60,7 +60,7 @@ The project follows modern backend engineering practices including:
 ---
 ```
 New Authentication Flow Section
-# 🔄 Refresh Token Rotation Flow
+🔄 Refresh Token Rotation Flow
 
 The project implements production-oriented Refresh Token Rotation for enhanced session security.
 
