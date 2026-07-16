@@ -57,6 +57,67 @@ The project follows modern backend engineering practices including:
 - Rate Limiting
 - Secure File Uploads
 - Swagger API Documentation
+---
+```
+New Authentication Flow Section
+# 🔄 Refresh Token Rotation Flow
+
+The project implements production-oriented Refresh Token Rotation for enhanced session security.
+
+```
+                User Login
+                     |
+                     ▼
+      Generate Access & Refresh Tokens
+                     |
+                     ▼
+         Hash Refresh Token (SHA-256)
+                     |
+                     ▼
+          Store Hashed Token in MongoDB
+                     |
+                     ▼
+      Send Plain Refresh Token as Cookie
+                     |
+                     ▼
+              Access Token Expires
+                     |
+                     ▼
+            POST /auth/refresh-token
+                     |
+                     ▼
+             Verify Refresh Token
+                     |
+                     ▼
+                  Find User
+                     |
+                     ▼
+         Compare Hashed Refresh Token
+                     |
+                     ▼
+                 Token Valid?
+                     |
+                    YES
+                     |
+                     ▼
+         Generate New Access Token
+                     |
+                     ▼
+         Generate New Refresh Token
+                     |
+                     ▼
+          Replace Previous Refresh Token
+                     |
+                     ▼
+           Store New Hashed Refresh Token
+                     |
+                     ▼
+             Send New Tokens to Client
+                     |
+                     ▼
+      Previous Refresh Token becomes Invalid
+```
+
 
 ---
 
@@ -69,6 +130,7 @@ The project follows modern backend engineering practices including:
 - Logout
 - JWT Authentication
 - Refresh Token Authentication
+- Refresh Token Rotation
 - Email Verification
 - Forgot Password
 - Reset Password
