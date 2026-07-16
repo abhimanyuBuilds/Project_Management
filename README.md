@@ -58,9 +58,11 @@ The project follows modern backend engineering practices including:
 - Secure File Uploads
 - Swagger API Documentation
 ---
+
+
+# New Authentication Flow Section
+## 🔄 Refresh Token Rotation Flow
 ```
-New Authentication Flow Section
-🔄 Refresh Token Rotation Flow
 
 The project implements production-oriented Refresh Token Rotation for enhanced session security.
 
